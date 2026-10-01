@@ -1,53 +1,354 @@
 <!doctype html>
-<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pāvé Archive</title>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pāvé Archive</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f4eae4;color:#422330;font:16px system-ui,sans-serif}header{display:flex;justify-content:space-between;align-items:center;padding:24px 5%;border-bottom:1px solid #dfc9c4}header strong{font-size:24px}small,.muted{color:#775e68}main{max-width:1120px;margin:auto;padding:38px 24px}h1{font-size:40px;letter-spacing:-1.5px;margin:8px 0}h2{font-size:22px}p{line-height:1.6}button,.pick{background:#671f38;color:white;border:0;border-radius:10px;padding:13px 18px;font:inherit;cursor:pointer}button:disabled{background:#e1e5df;color:#775e68;cursor:default}input,select{font:inherit;border:1px solid #d8bfc0;border-radius:8px;padding:11px;background:white;color:#422330;max-width:100%}label{display:grid;gap:8px}.panel{background:white;border:1px solid #dfc9c4;border-radius:18px;padding:24px;margin:24px 0}.row{display:flex;gap:16px;flex-wrap:wrap;align-items:center}.row>*{flex:1;min-width:160px}.steps{display:flex;gap:24px;flex-wrap:wrap;padding:18px 0;color:#775e68}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}.media{border:1px solid #dfc9c4;border-radius:14px;overflow:hidden;background:white}.media img,.media video,.placeholder{width:100%;height:190px;object-fit:contain;background:#eee0da}.placeholder{display:grid;place-items:center}.details{padding:16px;display:grid;gap:12px}.name{overflow-wrap:anywhere;font-weight:600}.badge{font-size:12px;padding:6px 10px;background:#efe0e1;border-radius:20px;display:inline-block}.notice{padding:12px 16px;background:#f1ded6;border-radius:10px;font-size:14px}.empty{text-align:center;padding:50px 16px;color:#775e68}dialog{border:1px solid #dfc9c4;border-radius:18px;max-width:500px;padding:28px}dialog::backdrop{background:#32172366}a{color:#671f38}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #d29a35;outline-offset:3px}@media(max-width:600px){h1{font-size:32px}header{padding:18px}main{padding:24px 16px}.panel{padding:18px}.steps{gap:12px;font-size:14px}}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 85% 0%,#e4bcc366,transparent 48%),#f4eae4;color:#422330;font:16px system-ui,sans-serif}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:20px 5%;border-bottom:1px solid #dfc9c4;background:#fff8f366}
+header strong{font-size:22px}
+.muted,small{color:#775e68}
+main{max-width:980px;margin:auto;padding:28px 16px 80px}
+h1{font-size:32px;letter-spacing:-1px;margin:4px 0 6px}
+h2{font-size:20px;margin:0 0 14px}
+p{line-height:1.55}
+.panel{background:#fffaf6d0;border:1px solid #dfc9c4;border-radius:18px;padding:22px;margin:20px 0;box-shadow:0 8px 28px #54203806}
+button,.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid #ffffff55;background:linear-gradient(145deg,#8e4564,#571e35);color:#fff;border-radius:14px;padding:13px 18px;font:inherit;font-weight:600;cursor:pointer;text-decoration:none}
+button:hover{filter:brightness(1.08)}
+button:disabled{background:#e1e5df;color:#8a7880;cursor:default;filter:none}
+.secondary{background:linear-gradient(145deg,#fffaf4,#ecd6db);color:#572c3d;border:1px solid #e6cfd2}
+.big{width:100%;font-size:19px;padding:18px}
+input,select{font:inherit;border:1px solid #d8bfc0;border-radius:10px;padding:11px;background:#fff;color:#422330;width:100%}
+label{display:grid;gap:6px;font-weight:600;font-size:15px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.drop{border:2px dashed #c9a4ad;border-radius:16px;padding:26px;text-align:center;background:#fff7f3}
+.drop.over{background:#f3dde2;border-color:#8e4564}
+.drop .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.pill{font-size:13px;padding:5px 10px;border-radius:20px;background:#efe0e1;display:inline-block}
+.ok{background:#dcefdc;color:#24502a}.bad{background:#f6d6d6;color:#7a1f1f}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:9px 6px;border-bottom:1px solid #eadbd6;vertical-align:top}
+td.path{color:#775e68;overflow-wrap:anywhere;font-size:13px}
+td.name{overflow-wrap:anywhere;font-weight:600}
+progress{width:100%;height:14px;accent-color:#8e4564}
+.notice{padding:12px 16px;background:#f1ded6;border-radius:10px;font-size:15px}
+ol li{margin:6px 0;line-height:1.5}
+code{background:#f1e4e0;padding:2px 6px;border-radius:6px;font-size:14px}
+.tablewrap{max-height:420px;overflow:auto}
+[hidden]{display:none!important}
+@media(max-width:720px){.grid3{grid-template-columns:1fr}h1{font-size:26px}.panel{padding:16px}th.hide,td.hide{display:none}}
 
-.shell{display:grid;grid-template-columns:210px 1fr;max-width:1440px;margin:auto}aside{padding:30px 20px;border-right:1px solid #dfc9c4}aside p{font-size:12px;letter-spacing:2px}nav{display:grid;gap:8px}nav button{text-align:left;background:transparent;color:#775e68}nav button.active{background:#ead0d6;color:#422330}main{width:100%;min-width:0}.accountbar{display:flex;align-items:center;gap:12px}.avatar{border-radius:50%;background:#ecd4d8;width:38px;height:38px;display:grid;place-items:center}.teamlist{display:grid;gap:12px}.member{display:flex;justify-content:space-between;gap:16px;padding:16px;background:#f7eeea;border-radius:10px}.member small{display:block;margin-top:4px}.secondary{background:#efddd8;color:#422330}.accountform{display:grid;gap:18px;max-width:470px}[hidden]{display:none!important}
-@media(max-width:720px){.shell{display:block}aside{border:0;padding:12px 16px}aside p{display:none}nav{display:flex}nav button{flex:1;text-align:center;padding:10px}.accountbar .badge{display:none}.member{flex-wrap:wrap}}
-
-body{background:radial-gradient(ellipse at 85% 0%,#e4bcc366,transparent 48%),#f4eae4}header{background:#fff8f366;backdrop-filter:blur(18px)}button,.pick{border:1px solid #ffffff55;background:linear-gradient(145deg,#8e4564dd,#571e35ee);box-shadow:inset 0 1px 0 #ffffff55,0 4px 12px #581d3515;border-radius:14px;backdrop-filter:blur(14px)}button:hover{filter:brightness(1.08)}.secondary{background:linear-gradient(145deg,#fffaf4bb,#e8cdd4aa);color:#572c3d;border:1px solid #fff9f6;box-shadow:inset 0 1px 0 #ffffffbb,0 4px 12px #581d350b}.panel{background:#fffaf6b8;box-shadow:0 8px 28px #54203806}nav button{box-shadow:none;border-color:transparent}nav button.active{background:linear-gradient(145deg,#fffaf4bb,#e8cdd4aa);border-color:#fff8f4}.member{align-items:center}.member select{min-width:130px}.member .actions{display:flex;gap:8px;flex-wrap:wrap}.accountform hr{width:100%;border:0;border-top:1px solid #dfc9c4}.file-info{border-top:1px solid #dfc9c4;padding-top:12px}.file-info summary{cursor:pointer;color:#671f38}.file-info p{font-size:13px;margin:8px 0;overflow-wrap:anywhere}h1{font-size:34px;letter-spacing:-1px}.steps{display:none}
-
-@media(max-width:720px){header{padding:16px;gap:8px}header strong{font-size:21px}.accountbar{gap:6px}.accountbar button{padding:9px 12px;font-size:14px}aside{padding:8px 12px}nav{gap:4px}nav button{min-width:0;padding:10px 6px;font-size:14px}main{padding:20px 14px}.row{gap:12px}.row>*{flex-basis:100%;min-width:0}.panel{padding:16px;margin:18px 0}.grid{grid-template-columns:1fr}.desktop-only{display:none}dialog{width:calc(100% - 24px);padding:20px}h1{font-size:28px}}
+header{backdrop-filter:blur(18px)}button{box-shadow:inset 0 1px 0 #ffffff55,0 4px 12px #581d3515}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #b66d83;outline-offset:3px}dialog{border:1px solid #dfc9c4;border-radius:18px;max-width:480px;padding:24px;background:#fffaf6;color:#422330}dialog::backdrop{background:#32172366}.cleanup-actions{display:flex;flex-wrap:wrap;gap:12px}#setup{margin-bottom:24px}#setupEnv{font-size:14px}#setupEnv h2{font-size:17px}@media(max-width:720px){header{padding:16px}main{padding:20px 14px}.drop{padding:16px}.desktop-hint{display:none}#pickFiles{width:100%}.tablewrap{max-height:360px}dialog{width:calc(100% - 24px)}.cleanup-actions>*{width:100%}}
 </style>
-<div id="app"><header><strong>Pāvé <span class="muted">/ Archive</span></strong><div class="accountbar"><span class="badge">Phone preview · demo</span><span id="avatar" class="avatar">B</span><button id="account" class="secondary">Sign in</button></div></header><div class="shell"><aside><p>SLS CONCEPTS</p><nav aria-label="Main navigation"><button class="active" id="archiveNav">Archive</button><button id="projectsNav">Projects</button><button id="teamNav">Team</button><button id="joinNav">Sign in</button></nav></aside>
-<main><div id="archiveView"><h1>Project archive</h1><p class="muted">Photos, videos, and documents for your projects.</p>
+</head>
+<body>
+<header>
+  <strong>Pāvé <span class="muted">/ Archive</span></strong>
+  <span id="conn" class="pill">Checking…</span>
+</header>
 
-<div class="notice">Preview: files save in this browser only. Dropbox is not connected. Keep originals.</div>
-<section class="panel"><h2>Upload destination</h2><p id="destinationPath" class="muted">Destination: Sample destination · Dropbox not connected</p><div class="row"><label>Client<input id="client" value="Pāvé" readonly></label><label>Project<select id="project"></select></label><label>Location<input id="location" value="Sample location" readonly></label><label class="pick">Add photos, videos or files<input id="files" type="file" multiple style="background:transparent;color:white;border:0;padding:0;font-size:13px"></label></div><p>Select multiple files together. Your batch starts automatically.</p><div class="row"><button id="startBatch" hidden disabled>Retry remaining files</button><button id="cancelBatch" disabled>Stop after current file</button></div><progress id="batchProgress" value="0" max="1" style="width:100%"></progress><p id="batchSummary" aria-live="polite">No files selected.</p><p id="message" role="status" aria-live="polite"></p></section>
-<div class="row"><label>Search your archive<input id="search" placeholder="Project, filename, location, or category"></label><label>Review status<select id="filter"><option value="all">All media</option><option>Needs review</option><option>Approved</option><option>Flagged</option></select></label><button id="cleanup">Free up phone space · locked</button><button id="export">Export index</button></div>
-<details class="panel"><summary>Connection status</summary><p>Dropbox, AI recognition, and secure team sign-in are not connected. Phone cleanup is unavailable.</p></details><p id="count" class="muted"></p><section id="gallery" class="grid" aria-label="Project media"></section>
+<main>
+<!-- ============ SETUP (only shows when something is missing) ============ -->
+<details id="setup" hidden><summary>Dropbox connection setup</summary>
+  <div id="setupEnv" class="panel" hidden>
+    <h2>Vercel is missing some settings</h2>
+    <p>Add these in Vercel → your project → Settings → Environment Variables, then Redeploy:</p>
+    <p id="missingList"></p>
+    <p class="muted">Full steps are in the README.</p>
+  </div>
+  <form id="setupPass" class="panel" hidden>
+    <h2>Enter the team passcode</h2>
+    <label>Passcode<input id="passInput" type="password" autocomplete="current-password" required></label>
+    <p><button type="submit">Continue</button></p>
+    <p id="passMsg" class="muted"></p>
+  </form>
+  <form id="setupConnect" class="panel" method="post" action="/api/dropbox-connect" hidden>
+    <h2>Connect Dropbox</h2>
+    <p>One time only. You'll approve the app in Dropbox, then paste one code into Vercel.</p>
+    <input type="hidden" name="passcode" id="connectPass">
+    <button type="submit">Connect Dropbox</button>
+    <p id="connectMsg" class="muted"></p>
+  </form>
+</details>
 
-</div><section id="projectsView" hidden><h1>Project connections</h1><p class="muted">Match a project to its Dropbox destination before uploading. AI labels stay inside that project.</p><div class="notice">Initial source-backed inventory. Folder matches and historical coverage are incomplete. Creating a draft here does not create a Dropbox folder.</div><section class="panel"><h2>Projects & folder matches</h2><div id="projectList" class="teamlist"></div></section><section class="panel"><h2>Project intake · local draft</h2><form id="projectForm" class="accountform"><label>Client<input id="newClient" required maxlength="120"></label><label>Project / event name<input id="newProject" required maxlength="180"></label><label>Start month / year<input id="newDate" type="month" required></label><label>City / country<input id="newCity" required maxlength="150"></label><label>Venue / house / location<input id="newVenue" required maxlength="180"></label><label>Purpose<select id="newPurpose"><option>House walkthrough</option><option>Production / installation</option><option>Furniture / rentals</option><option>Damage / returns</option><option>Final deliverables</option></select></label><label>Source email or CRM URL<input id="newSource" type="url" required placeholder="https://…"></label><label>Existing Dropbox folder URL, if known<input id="newFolder" type="url" placeholder="https://www.dropbox.com/…"></label><button type="submit">Save project draft</button><p id="projectStatus" role="status"></p><small>Admin review will confirm the source, duplicate match, and actual Dropbox folder ID before enabling uploads.</small></form></section></section><section id="teamView" hidden><h1>Team access</h1><p class="muted">Only approved members can enter the workspace.</p><div class="notice">Local access-flow demo. Real authentication and server permissions are not connected. No invitations are sent.</div><section class="panel"><h2>Members & approvals</h2><div id="members" class="teamlist"></div></section><section class="panel"><h2>Add a teammate</h2><form id="inviteForm" class="accountform"><label>Name<input id="inviteName" required maxlength="80" placeholder="Teammate"></label><label>Email<input id="inviteEmail" type="email" required maxlength="200" placeholder="name@company.com"></label><button type="submit">Add pending member · demo</button><p id="inviteStatus" role="status"></p></form></section><section class="panel"><h2>Project permissions</h2><p>Approved contributors can open and add files to projects assigned to them. They cannot overwrite another person's original.</p><p>Admins approve members, assign projects, and manage reviews. The owner can appoint admins.</p><p class="muted">The demo uses the current project for all approved members. Project-level enforcement belongs in the connected backend.</p></section></section><section id="joinView" hidden><h1>Sign in</h1><p class="muted">Private workspace · invitation required.</p><div class="notice">Sign-in preview. Google and email authentication are not connected.</div><section class="panel"><form id="joinForm" class="accountform"><button type="button" id="google">Continue with Google</button><hr><label>Email address<input id="email" type="email" autocomplete="email" placeholder="name@company.com" required maxlength="200"></label><button type="submit">Continue with email · demo</button><p id="authStatus" role="status">An admin must approve your membership before you can access projects.</p></form></section></section></main></div></div><dialog id="dialog"><h2>Free up phone space</h2><p>This is a separate step after upload, not an upload destination.</p><p><strong>Cleanup is locked.</strong> No originals have been verified in Dropbox yet. This preview cannot delete photos from your phone.</p><p>In the mobile app, verified items will appear here. You can select “Delete from phone” and confirm through your phone’s photo-library prompt.</p><div class="row"><button id="deleteOriginals" disabled aria-describedby="cleanupRequirement">Delete originals from phone</button><button id="close">Keep originals</button></div><p id="cleanupRequirement" class="muted">Delete becomes available after Dropbox verification and phone photo-library access are connected. Keeping originals leaves your phone files in place.</p></dialog>
+<!-- ============ MAIN APP ============ -->
+<section id="app" hidden>
+  <h1>Add to the archive</h1>
+  <p class="muted">Choose a project and add a batch of photos, videos, or files.</p>
+
+  <div class="panel">
+    <h2>Project destination</h2>
+    <div class="grid3">
+      <label>Client<input id="client" list="clientList" placeholder="e.g. Pāvé" autocomplete="off"></label>
+      <label>Project<input id="project" list="projectList" placeholder="e.g. Zeus House 2026" autocomplete="off"></label>
+      <label>Folder<select id="purpose"><option value="">Sort by file type only</option></select></label>
+    </div>
+    <datalist id="clientList"></datalist><datalist id="projectList"></datalist>
+  </div>
+
+  <div class="panel">
+    <h2>Add to archive</h2>
+    <div id="drop" class="drop">
+      <div class="desktop-hint">Drop a batch here, or select files below.</div>
+      <div class="row">
+        <button type="button" id="pickFiles">Add photos, videos or files</button>
+        <button type="button" class="secondary" id="clearBtn" hidden>Clear list</button>
+      </div>
+      <input id="files" type="file" multiple hidden>
+    </div>
+    <p id="summary" class="muted">No files yet.</p>
+    <div class="tablewrap" id="tableWrap" hidden>
+      <table><thead><tr><th>File</th><th class="hide">Goes to</th><th>Status</th></tr></thead><tbody id="rows"></tbody></table>
+    </div>
+
+    <button id="uploadBtn" class="secondary" disabled hidden>Resume upload</button>
+    <p></p>
+    <progress id="bar" value="0" max="1" hidden></progress>
+    <p id="msg" role="status" aria-live="polite"></p>
+    <p><button id="stopBtn" class="secondary" hidden>Stop</button> <button id="retryBtn" class="secondary" hidden>Retry failed files</button></p>
+  </div>
+
+  <details><summary>Sorting details</summary><p class="muted" id="rule"></p></details><p><button id="cleanupBtn" class="secondary">Free up phone space</button></p>
+</section>
+</main><dialog id="cleanupDialog"><h2>Keep or delete originals</h2><p>Phone deletion is not connected. Keep your originals, even after an upload completes.</p><div class="cleanup-actions"><button id="deleteOriginals" disabled>Delete originals from phone</button><button id="keepOriginals" class="secondary">Keep originals</button></div></dialog>
+
 <script>
-const $=id=>document.getElementById(id);const initialRegistry={"completeHistoricalInventory": false, "projects": [{"id": "demo-project", "name": "Sample project", "client": "P\u0101v\u00e9", "location": "Sample location", "sourceType": "Demo", "mappingStatus": "Preview only", "destinationKey": "demo", "folderPath": "Sample destination \u00b7 Dropbox not connected"}]};let projectRegistry=initialRegistry.projects;let selectedProject=projectRegistry[0];try{projectRegistry.push(...JSON.parse(localStorage.getItem('pave-project-drafts')||'[]'))}catch{};let records=[],urls=[];const categories=['Unsorted','Rental items','Furniture','Lighting','Décor','Venue','Damage','Documents','Other'];let db;
-const request=indexedDB.open('pave-archive-prototype',1);request.onupgradeneeded=()=>request.result.createObjectStore('media',{keyPath:'id'});request.onerror=()=>{$('message').textContent='Browser storage is unavailable. Please open this prototype in a regular browser.'};request.onsuccess=()=>{db=request.result;const r=db.transaction('media').objectStore('media').getAll();r.onsuccess=()=>{records=r.result;render()}};
-function save(record){return new Promise((resolve,reject)=>{const tx=db.transaction('media','readwrite');tx.objectStore('media').put(record);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error)})}
-function node(tag,text,cls){const e=document.createElement(tag);if(text)e.textContent=text;if(cls)e.className=cls;return e}
-function render(){urls.forEach(URL.revokeObjectURL);urls=[];const query=$('search').value.toLowerCase(),filter=$('filter').value;const visible=records.filter(r=>[r.name,r.client,r.project,r.location,r.category,...(r.recognition?.labels||[]).filter(l=>l.confidence>=0.15).map(l=>l.label)].join(' ').toLowerCase().includes(query)&&(filter==='all'||r.status===filter));$('gallery').replaceChildren();$('count').textContent=`${visible.length} items · ${records.filter(r=>r.status==='Needs review').length} need review · 0 verified in Dropbox`;
-if(!visible.length)$('gallery').append(node('div',records.length?'No matching media.':'Your archive starts with a few photos.','empty'));
-visible.forEach(r=>{const card=node('article',null,'media');const url=URL.createObjectURL(r.blob);urls.push(url);let media;if(r.type.startsWith('image/')){media=node('img');media.src=url;media.alt=r.name;media.onerror=()=>media.replaceWith(node('div','Preview unavailable · original retained','placeholder'))}else if(r.type.startsWith('video/')){media=node('video');media.src=url;media.controls=true;media.preload='metadata'}else{media=node('div','Document / file','placeholder')}card.append(media);const detail=node('div',null,'details');detail.append(node('div',r.name,'name'),node('small',`${r.project} / ${r.location}`),node('span','Local only · Dropbox pending','badge'));[['Category','category',categories],['Review','status',['Needs review','Approved','Flagged']]].forEach(([label,key,options])=>{const wrap=node('label',label),select=node('select');options.forEach(value=>{const opt=node('option',value);opt.value=value;select.append(opt)});select.value=r[key];select.onchange=async()=>{const old=r[key];r[key]=select.value;try{await save(r);render()}catch{r[key]=old;select.value=old;$('message').textContent='Could not save the change. Try again.'}};wrap.append(select);detail.append(wrap)});const download=node('a','Download selected original');download.href=url;download.download=r.name;detail.append(download);if(r.type.startsWith('image/')){const recognize=node('button','AI labels · unavailable');recognize.disabled=true;recognize.onclick=async()=>{recognize.disabled=true;recognize.textContent='Looking at preview…';try{const image=await createImageBitmap(r.blob);const canvas=document.createElement('canvas');const scale=Math.min(1,1024/Math.max(image.width,image.height));canvas.width=Math.max(1,Math.round(image.width*scale));canvas.height=Math.max(1,Math.round(image.height*scale));canvas.getContext('2d').drawImage(image,0,0,canvas.width,canvas.height);image.close();const preview=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.8));const response=await fetch('/api/recognize',{method:'POST',headers:{'Content-Type':'image/jpeg'},body:preview});const result=await response.json();if(!response.ok)throw Error(result.error);r.recognition={...result,processedAt:new Date().toISOString()};await save(r);render()}catch{recognize.disabled=false;recognize.textContent='Retry labels';$('message').textContent='Recognition unavailable for this image. Original retained; choose a category manually.'}};detail.append(recognize)}if(r.recognition){const labels=r.recognition.labels.filter(x=>x.confidence>=0.15).map(x=>x.label);detail.append(node('small',labels.length?'Suggested labels: '+labels.join(', ')+' · review required':'No clear labels · choose a category manually'))}const info=node('details',null,'file-info');info.append(node('summary','File details'),node('p',`Uploaded by ${r.uploadedBy||'Unknown · legacy upload'}`),node('p',`Added ${new Date(r.createdAt).toLocaleString()}`),node('p',`${(r.size/1024/1024).toFixed(2)} MB · ${r.type||'File'}`));detail.append(info);card.append(detail);$('gallery').append(card)})}
-let pendingFiles=[],batchRunning=false,stopBatch=false;
-function selectBatch(e){if(batchRunning)return;pendingFiles=Array.from(e.target.files);$('startBatch').disabled=!pendingFiles.length;$('batchSummary').textContent=`${pendingFiles.length} files selected · ${(pendingFiles.reduce((n,f)=>n+f.size,0)/1048576).toFixed(1)} MB. Ready to save in this browser.`;$('message').textContent='Starting batch…';if(pendingFiles.length)$('startBatch').click();}
-$('files').onchange=selectBatch;
-$('cancelBatch').onclick=()=>{stopBatch=true};
-$('startBatch').onclick=async()=>{if(!db){$('message').textContent='Browser storage unavailable or still loading. Keep originals and try again.';return}if(activeProfile.state!=='Approved'||!selectedProject.destinationKey){$('message').textContent='Choose an approved project first.';return}batchRunning=true;stopBatch=false;const projectRecord={...selectedProject},uploader=activeProfile.name,files=[...pendingFiles];let added=0,failed=[],remaining=[];$('startBatch').disabled=true;$('cancelBatch').disabled=false;$('files').disabled=true;$('project').disabled=true;$('batchProgress').max=files.length;for(let i=0;i<files.length;i++){if(stopBatch){remaining.push(...files.slice(i));break}const file=files[i];$('message').textContent=`Saving ${i+1} of ${files.length}: ${file.name}`;const record={id:crypto.randomUUID(),name:file.name,relativePath:file.webkitRelativePath||file.name,size:file.size,type:file.type,project:projectRecord.name,location:projectRecord.location,category:'Unsorted',status:'Needs review',archive:'local_only',createdAt:new Date().toISOString(),uploadedBy:uploader,client:projectRecord.client,projectId:projectRecord.id,destinationKey:projectRecord.destinationKey,blob:file};try{await save(record);records.push(record);added++}catch{failed.push(file);remaining.push(...files.slice(i+1));break}$('batchProgress').value=i+1;}pendingFiles=[...failed,...remaining];batchRunning=false;$('files').disabled=false;$('project').disabled=false;$('cancelBatch').disabled=true;$('startBatch').disabled=!pendingFiles.length;$('startBatch').hidden=!pendingFiles.length;$('startBatch').textContent='Retry remaining files';$('batchSummary').textContent=`${added} saved locally · ${failed.length} failed · ${remaining.length} not processed.`;$('message').textContent=failed.length?'Browser storage could not save '+failed[0].name+'. Remaining files are queued. Keep originals.':stopBatch?'Batch stopped. Remaining files are queued.':'Batch saved in this browser. Dropbox transfer is not connected; keep originals.';render();};
-$('search').oninput=render;$('filter').onchange=render;$('cleanup').onclick=()=>$('dialog').showModal();$('close').onclick=()=>$('dialog').close();$('export').onclick=()=>{const data=records.map(({blob,...metadata})=>metadata);const url=URL.createObjectURL(new Blob([JSON.stringify({prototype:true,dropboxVerified:false,items:data},null,2)],{type:'application/json'}));const a=node('a');a.href=url;a.download='pave-archive-index.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
+const $ = id => document.getElementById(id);
+const store = { get(k){try{return localStorage.getItem(k)}catch{return null}}, set(k,v){try{localStorage.setItem(k,v)}catch{}}, del(k){try{localStorage.removeItem(k)}catch{}} };
+let passcode = store.get('pave-passcode') || '';
+let RULES = { types:{}, purposes:[] }, ROOT = '/Pave Archive', projectsByClient = {};
+let items = []; // {file, date, status, path, error}
+let running = false, stopping = false, connected = false;
+$('cleanupBtn').onclick=()=>$('cleanupDialog').showModal();$('keepOriginals').onclick=()=>$('cleanupDialog').close();
 
+// ---------------- API ----------------
+async function api(path, body) {
+  const r = await fetch(path, {
+    method: body ? 'POST' : 'GET',
+    headers: Object.assign({ 'x-app-passcode': passcode }, body ? { 'Content-Type': 'application/json' } : {}),
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const j = await r.json().catch(() => ({ error: 'Server error ' + r.status }));
+  if (r.status === 401) { store.del('pave-passcode'); passcode = ''; }
+  if (!r.ok) { const e = new Error(j.error || 'Error ' + r.status); e.status = r.status; throw e; }
+  return j;
+}
 
-let profiles;try{profiles=JSON.parse(localStorage.getItem('pave-demo-profiles'))||[{name:'Owner',email:'',role:'Owner',state:'Approved'}]}catch{profiles=[{name:'Owner',email:'',role:'Owner',state:'Approved'}]};profiles.forEach(p=>{if(!p.state)p.state=p.role==='Owner'?'Approved':'Pending'});let activeProfile=profiles.find(p=>p.role==='Owner')||profiles[0];
-function persistProfiles(){try{localStorage.setItem('pave-demo-profiles',JSON.stringify(profiles))}catch{}}
-function isAdmin(){return activeProfile.state==='Approved'&&['Owner','Admin'].includes(activeProfile.role)}
-function showView(view){if(view==='archive'&&activeProfile.state!=='Approved')view='join';if(view==='team'&&!isAdmin())view='join';if(view==='projects'&&activeProfile.state!=='Approved')view='join';['archive','projects','team','join'].forEach(v=>{$(v+'View').hidden=v!==view;$(v+'Nav').classList.toggle('active',v===view)});if(view==='team')renderMembers();if(view==='projects')renderProjects()}
-function renderMembers(){$('members').replaceChildren();profiles.forEach(profile=>{const row=node('div',null,'member'),info=node('div',profile.name);info.append(node('small',`${profile.role} · ${profile.state}`));const actions=node('div',null,'actions');if(profile.role!=='Owner'){if(profile.state==='Pending'){const approve=node('button','Approve');approve.onclick=()=>{profile.state='Approved';persistProfiles();renderMembers()};const reject=node('button','Reject','secondary');reject.onclick=()=>{profile.state='Rejected';persistProfiles();renderMembers()};actions.append(approve,reject)}if(profile.state==='Approved'&&activeProfile.role==='Owner'){const select=node('select');select.setAttribute('aria-label','Role for '+profile.name);['Contributor','Reviewer','Admin'].forEach(role=>{const opt=node('option',role);select.append(opt)});select.value=profile.role;select.onchange=()=>{profile.role=select.value;persistProfiles();renderMembers()};actions.append(select)}}row.append(info,actions);$('members').append(row)})}
-function updateProfile(){$('avatar').textContent=activeProfile.name.charAt(0).toUpperCase();$('account').textContent=activeProfile.name;$('teamNav').hidden=!isAdmin();}
-['archive','projects','team','join'].forEach(v=>$(v+'Nav').onclick=()=>showView(v));$('account').onclick=()=>showView('join');
-$('google').onclick=()=>{$('authStatus').textContent='Google sign-in will verify your invited email. It never grants workspace access without approved membership.'};
-$('joinForm').onsubmit=e=>{e.preventDefault();const email=$('email').value.trim().toLowerCase(),profile=profiles.find(p=>p.email.toLowerCase()===email);if(!profile||profile.state==='Rejected'){$('authStatus').textContent='No approved invitation found. Contact your Pāvé admin.';return}if(profile.state!=='Approved'){$('authStatus').textContent='Your membership is awaiting admin approval. Projects stay private.';return}activeProfile=profile;updateProfile();showView('archive');$('message').textContent=`Demo session: ${activeProfile.name}. Sign-in identity is not verified in this prototype.`};
-$('inviteForm').onsubmit=e=>{e.preventDefault();if(!isAdmin())return;const name=$('inviteName').value.trim(),email=$('inviteEmail').value.trim().toLowerCase();if(!name)return;if(profiles.some(p=>p.email.toLowerCase()===email)){$('inviteStatus').textContent='This email is already listed.';return}profiles.push({name,email,role:'Contributor',state:'Pending'});persistProfiles();renderMembers();$('inviteStatus').textContent='Pending member added locally. Approve above; no email was sent.';e.target.reset()};updateProfile();
+// ---------------- startup ----------------
+async function boot() {
+  let s;
+  try { s = await api('/api/status'); }
+  catch (e) {
+    if (e.status === 401) { s = { ready: false, step: 'passcode' }; setTimeout(() => $('passMsg').textContent = 'Wrong passcode. Try again.'); }
+    else if (e.status === 500) { s = { ready: false, step: 'env', missing: [] }; setTimeout(() => $('missingList').textContent = e.message); }
+  }
+  if (!s) {
+    $('conn').textContent = 'Server not reachable'; $('conn').className = 'pill bad';
+    $('setup').hidden = false; $('setupEnv').hidden = false;
+    $('missingList').textContent = 'The /api server is not running. Open this site from its Vercel address (not as a file).';
+    return;
+  }
+  ['setupEnv','setupPass','setupConnect'].forEach(id => $(id).hidden = true);
+  if (!s.ready) {
+    $('setup').hidden = false; $('app').hidden = false; connected=false; $('conn').textContent='Dropbox not connected'; refresh();
+    $('conn').textContent = 'Not set up'; $('conn').className = 'pill bad';
+    if (s.step === 'env') { $('setupEnv').hidden = false; $('missingList').innerHTML = s.missing.map(m => '<code>'+m+'</code>').join(' '); }
+    if (s.step === 'passcode') $('setupPass').hidden = false;
+    if (s.step === 'connect') { $('setupConnect').hidden = false; $('connectPass').value = passcode; if (s.error) $('connectMsg').textContent = s.error; }
+    return;
+  }
+  connected=true; RULES = { types: s.types, purposes: s.purposes }; ROOT = s.root;
+  $('setup').hidden = true; $('app').hidden = false;
+  $('conn').textContent = 'Dropbox connected' + (s.account ? ' · ' + s.account : ''); $('conn').className = 'pill ok';
+  $('purpose').replaceChildren(new Option('Sort by file type only', ''), ...s.purposes.map(p => new Option(p, p)));
+  $('client').value = store.get('pave-client') || ''; $('project').value = store.get('pave-project') || ''; $('purpose').value = store.get('pave-purpose') || '';
+  $('rule').textContent = `How files are sorted: ${ROOT} / Client / Project / [Folder] / Photos·Videos·Documents / Year-Month / Date + original name. Nothing is ever overwritten. Exact duplicates are skipped.`;
+  loadProjects(); refresh();
+}
 
-function fillProjects(){const select=$('project');select.replaceChildren();projectRegistry.forEach(p=>{const option=node('option',p.name+(p.destinationKey?'':' · folder pending'));option.value=p.id;select.append(option)});select.value=selectedProject.id}
-$('project').onchange=()=>{selectedProject=projectRegistry.find(p=>p.id===$('project').value);$('client').value=selectedProject.client||'Needs confirmation';$('location').value=selectedProject.location||'Needs confirmation';$('files').disabled=!selectedProject.destinationKey;$('destinationPath').textContent=selectedProject.folderPath?'Destination: '+selectedProject.folderPath:'Uploads locked · '+selectedProject.mappingStatus;$('message').textContent=selectedProject.destinationKey?'Zeus pilot destination selected. Dropbox is not connected yet.':'Confirm this project and link its folder before uploading.'};
-function renderProjects(){$('projectList').replaceChildren();projectRegistry.forEach(p=>{const row=node('div',null,'member'),info=node('div',p.name);info.append(node('small',p.mappingStatus+' · '+p.sourceType+(p.startMonth?' · '+p.startMonth:'')));const detail=node('details');detail.append(node('summary','Connection details'),node('p',p.folderPath||'Dropbox folder: not linked'),node('p',p.dateDescription||(p.startMonth?`${p.startMonth} · ${p.dateBasis||'Start month'}`:'Start month / year needs confirmation')),node('p',p.notes||''));if(p.sourceUrl){const link=node('a','Open source evidence');link.href=p.sourceUrl;link.target='_blank';link.rel='noopener';detail.append(link)}if(p.dateEvidence){const evidence=node('a','Open date email');evidence.href=p.dateEvidence.url;evidence.target='_blank';evidence.rel='noopener';detail.append(evidence)}info.append(detail);row.append(info);$('projectList').append(row)})}
-$('projectForm').onsubmit=e=>{e.preventDefault();if(!isAdmin()){$('projectStatus').textContent='An approved admin must create project records.';return}const name=$('newProject').value.trim(),client=$('newClient').value.trim(),date=$('newDate').value,city=$('newCity').value.trim(),venue=$('newVenue').value.trim();if(projectRegistry.some(p=>p.name.toLowerCase()===name.toLowerCase()&&p.client?.toLowerCase()===client.toLowerCase())){$('projectStatus').textContent='Possible duplicate. Check the existing project before adding another.';return}const draft={id:crypto.randomUUID(),name,client,startMonth:date,datePrecision:"month",dateBasis:"Intake · needs source review",location:venue,city,purpose:$('newPurpose').value,sourceType:'Local intake draft',sourceUrl:$('newSource').value,proposedFolderUrl:$('newFolder').value,folderPath:null,mappingStatus:'Admin folder verification needed'};try{const drafts=JSON.parse(localStorage.getItem('pave-project-drafts')||'[]');drafts.push(draft);localStorage.setItem('pave-project-drafts',JSON.stringify(drafts));projectRegistry.push(draft);fillProjects();renderProjects();$('projectStatus').textContent='Draft saved locally. Uploads stay locked until the actual folder is verified.';e.target.reset()}catch{$('projectStatus').textContent='Could not save the draft. Please try again.'}};fillProjects();
-</script></html>
+$('setupPass').onsubmit = e => {
+  e.preventDefault(); passcode = $('passInput').value.trim(); store.set('pave-passcode', passcode); $('passMsg').textContent = ''; boot();
+};
+
+async function loadProjects() {
+  try {
+    const { clients } = await api('/api/projects');
+    projectsByClient = {}; clients.forEach(c => projectsByClient[c.client] = c.projects);
+    $('clientList').replaceChildren(...clients.map(c => new Option(c.client)));
+    fillProjectList();
+  } catch {}
+}
+function fillProjectList() { $('projectList').replaceChildren(...(projectsByClient[$('client').value.trim()] || []).map(p => new Option(p))); }
+
+// ---------------- sorting preview (server decides for real) ----------------
+function cleanPart(s){return String(s||'').normalize('NFC').replace(/[\u0000-\u001f\u007f]/g,'').replace(/[\/\\:*?"<>|]/g,'-').replace(/\s+/g,' ').trim().replace(/^[.\s]+|[.\s]+$/g,'')}
+function typeFolder(f) {
+  const ext = (f.name.split('.').pop() || '').toLowerCase();
+  for (const [folder, exts] of Object.entries(RULES.types)) if (exts.includes(ext)) return folder;
+  if (f.type.startsWith('image/')) return 'Photos'; if (f.type.startsWith('video/')) return 'Videos'; if (f.type.startsWith('audio/')) return 'Audio';
+  return 'Other files';
+}
+function previewPath(it) {
+  const c = cleanPart($('client').value), p = cleanPart($('project').value), pu = $('purpose').value;
+  let name = cleanPart(it.file.name) || 'file'; if (!name.startsWith(it.date)) name = it.date + ' ' + name;
+  return [ROOT, c || '‹client›', p || '‹project›', pu, typeFolder(it.file), it.date.slice(0, 7), name].filter(Boolean).join('/');
+}
+
+// ---------------- photo date (reads the camera date inside JPEGs) ----------------
+async function photoDate(file) {
+  try {
+    if (!/jpe?g$/i.test(file.name) && file.type !== 'image/jpeg') return null;
+    const dv = new DataView(await file.slice(0, 262144).arrayBuffer());
+    if (dv.getUint16(0) !== 0xFFD8) return null;
+    let off = 2;
+    while (off + 4 < dv.byteLength) {
+      const marker = dv.getUint16(off), size = dv.getUint16(off + 2);
+      if (marker === 0xFFE1 && dv.getUint32(off + 4) === 0x45786966) {
+        const t = off + 10, le = dv.getUint16(t) === 0x4949;
+        const u16 = o => dv.getUint16(o, le), u32 = o => dv.getUint32(o, le);
+        const find = (ifd, tag) => { const n = u16(ifd); for (let i = 0; i < n; i++) { const e = ifd + 2 + i * 12; if (u16(e) === tag) return { count: u32(e + 4), val: u32(e + 8) }; } return null; };
+        const str = ent => { let s = ''; for (let i = 0; i < 19; i++) s += String.fromCharCode(dv.getUint8(t + ent.val + i)); return s; };
+        const ifd0 = t + u32(t + 4); let ent = null;
+        const exifPtr = find(ifd0, 0x8769); if (exifPtr) ent = find(t + exifPtr.val, 0x9003);
+        if (!ent) ent = find(ifd0, 0x0132);
+        if (!ent) return null;
+        const m = str(ent).match(/^(\d{4}):(\d{2}):(\d{2})/); return m ? `${m[1]}-${m[2]}-${m[3]}` : null;
+      }
+      if ((marker & 0xFF00) !== 0xFF00) break;
+      off += 2 + size;
+    }
+  } catch {}
+  return null;
+}
+const localDay = ms => { const d = new Date(ms || Date.now()); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
+
+// ---------------- adding files ----------------
+async function addFiles(list) {
+  if (running) return;
+  const seen = new Set(items.map(i => i.file.name + i.file.size + i.file.lastModified));
+  const fresh = [...list].filter(f => !f.name.startsWith('.') && f.size > 0 && !seen.has(f.name + f.size + f.lastModified));
+  $('summary').textContent = 'Reading files…';
+  for (const f of fresh) items.push({ file: f, date: (await photoDate(f)) || localDay(f.lastModified), status: 'Ready' });
+  refresh();
+  if(connected && $('client').value.trim() && $('project').value.trim()) await runQueue(items.filter(i=>i.status==='Ready'));
+  else $('msg').textContent=connected?'Choose Client and Project, then resume your batch.':'Files selected. Dropbox is not connected yet; nothing has been transferred.';
+}
+$('pickFiles').onclick = () => $('files').click();
+
+$('files').onchange = e => { addFiles(e.target.files); e.target.value = ''; };
+
+$('clearBtn').onclick = () => { if (!running) { items = []; refresh(); $('msg').textContent = ''; $('bar').hidden = true; } };
+const drop = $('drop');
+['dragenter','dragover'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave','drop'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', e => addFiles(e.dataTransfer.files));
+['client','project','purpose'].forEach(id => $(id).addEventListener('input', () => { store.set('pave-' + id, $(id).value); if (id === 'client') fillProjectList(); refresh(); }));
+
+// ---------------- table ----------------
+const mb = n => (n / 1048576).toFixed(1) + ' MB';
+function refresh() {
+  const wrap = $('tableWrap'), body = $('rows');
+  wrap.hidden = !items.length; $('clearBtn').hidden = !items.length || running;
+  body.replaceChildren(...items.map(it => {
+    const tr = document.createElement('tr');
+    const a = document.createElement('td'); a.className = 'name'; a.textContent = it.file.name; const sm = document.createElement('small'); sm.textContent = ' ' + mb(it.file.size); a.append(sm);
+    const b = document.createElement('td'); b.className = 'path hide'; b.textContent = it.path || previewPath(it);
+    const c = document.createElement('td'); const pill = document.createElement('span'); pill.className = 'pill' + (it.status === 'Done' || it.status === 'Already there' ? ' ok' : it.status === 'Failed' ? ' bad' : '');
+    pill.textContent = it.status; pill.title = it.error || ''; c.append(pill); if (it.error) { const e = document.createElement('small'); e.textContent = ' ' + it.error; c.append(document.createElement('br'), e); }
+    tr.append(a, b, c); return tr;
+  }));
+  const todo = items.filter(i => i.status === 'Ready' || i.status === 'Failed');
+  const total = todo.reduce((n, i) => n + i.file.size, 0);
+  $('summary').textContent = items.length ? `${items.length} files · ${todo.length} waiting to upload (${mb(total)})` : 'No files yet.';
+  const ok = $('client').value.trim() && $('project').value.trim();
+  $('uploadBtn').hidden=running || !connected || !todo.some(i=>i.status==='Ready');
+  $('pickFiles').disabled=running; ['client','project','purpose'].forEach(id=>$(id).disabled=running);
+  $('uploadBtn').disabled = !connected || running || !todo.filter(i => i.status === 'Ready').length || !ok;
+  $('uploadBtn').textContent = running ? 'Uploading…' : !ok && items.length ? 'Fill in Client and Project first' : `Upload ${todo.filter(i => i.status === 'Ready').length || ''} files to Dropbox`.replace('  ', ' ');
+  $('retryBtn').hidden = running || !items.some(i => i.status === 'Failed');
+}
+
+// ---------------- uploading ----------------
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const headerJson = o => JSON.stringify(o).replace(/[\u007f-￿]/g, c => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
+let sentBytes = 0, totalBytes = 0;
+function bump(n) { sentBytes += n; $('bar').value = sentBytes; }
+
+function xhrPost(url, body, headers, onProgress) {
+  return new Promise((resolve, reject) => {
+    const x = new XMLHttpRequest(); x.open('POST', url);
+    Object.entries(headers).forEach(([k, v]) => x.setRequestHeader(k, v));
+    let last = 0; x.upload.onprogress = e => { onProgress(e.loaded - last); last = e.loaded; };
+    x.onload = () => { if (x.status >= 200 && x.status < 300) { onProgress(body.size - last); resolve(x.responseText); } else { onProgress(-last); const e = new Error('Dropbox said ' + x.status + ': ' + x.responseText.slice(0, 120)); e.status = x.status; reject(e); } };
+    x.onerror = () => { onProgress(-last); const e = new Error('Network problem'); e.status = 0; reject(e); };
+    x.send(body);
+  });
+}
+
+async function uploadOne(it) {
+  const f = it.file;
+  const plan = await api('/api/upload-link', { client: $('client').value, project: $('project').value, purpose: $('purpose').value, name: f.name, size: f.size, type: f.type, date: it.date });
+  it.path = plan.path;
+  if (plan.skip) { bump(f.size); return 'Already there'; }
+  if (plan.mode === 'link') {
+    const txt = await xhrPost(plan.link, f, { 'Content-Type': 'application/octet-stream' }, bump);
+    try { const j = JSON.parse(txt); if (j.path_display) it.path = j.path_display; } catch {}
+    return 'Done';
+  }
+  // big file: chunked upload session
+  const CHUNK = 8 * 1048576, auth = { Authorization: 'Bearer ' + plan.token, 'Content-Type': 'application/octet-stream' };
+  const startTxt = await xhrPost('https://content.dropboxapi.com/2/files/upload_session/start', f.slice(0, CHUNK), { ...auth, 'Dropbox-API-Arg': headerJson({ close: false }) }, bump);
+  const session = JSON.parse(startTxt).session_id;
+  let off = Math.min(CHUNK, f.size);
+  while (off < f.size) {
+    if (f.size - off <= CHUNK) break;
+    await xhrPost('https://content.dropboxapi.com/2/files/upload_session/append_v2', f.slice(off, off + CHUNK), { ...auth, 'Dropbox-API-Arg': headerJson({ cursor: { session_id: session, offset: off }, close: false }) }, bump);
+    off += CHUNK;
+  }
+  const done = await xhrPost('https://content.dropboxapi.com/2/files/upload_session/finish', f.slice(off), { ...auth, 'Dropbox-API-Arg': headerJson({ cursor: { session_id: session, offset: off }, commit: { path: plan.path, mode: 'add', autorename: true, mute: true } }) }, bump);
+  try { it.path = JSON.parse(done).path_display || it.path; } catch {}
+  return 'Done';
+}
+
+async function runQueue(list) {
+  if (!list.length) return;
+  running = true; stopping = false;
+  $('stopBtn').hidden = false; $('bar').hidden = false;
+  sentBytes = 0; totalBytes = list.reduce((n, i) => n + i.file.size, 0); $('bar').max = totalBytes || 1; $('bar').value = 0;
+  list.forEach(i => { i.status = 'Waiting'; i.error = ''; }); refresh();
+  let next = 0;
+  const worker = async () => {
+    while (!stopping && next < list.length) {
+      const it = list[next++]; it.status = 'Uploading…'; refresh();
+      $('msg').textContent = `Uploading ${list.filter(i => ['Done','Already there','Failed'].includes(i.status)).length + 1} of ${list.length}…`;
+      for (let attempt = 1; ; attempt++) {
+        try { it.status = await uploadOne(it); break; }
+        catch (e) {
+          const retryable = e.status === 0 || e.status === 429 || e.status >= 500;
+          if (retryable && attempt < 3) { await sleep(2000 * attempt); continue; }
+          it.status = 'Failed'; it.error = e.message; break;
+        }
+      }
+      refresh();
+    }
+  };
+  await Promise.all([worker(), worker(), worker()]);
+  list.filter(i => i.status === 'Waiting').forEach(i => i.status = 'Ready');
+  running = false; $('stopBtn').hidden = true;
+  const done = list.filter(i => i.status === 'Done').length, dup = list.filter(i => i.status === 'Already there').length, bad = list.filter(i => i.status === 'Failed').length;
+  $('msg').innerHTML = '';
+  $('msg').append(`✅ ${done} uploaded` + (dup ? ` · ${dup} already in Dropbox (skipped)` : '') + (bad ? ` · ❌ ${bad} failed — press Retry` : '') + (stopping ? ' · stopped early' : '') + '. ');
+  const link = document.createElement('a'); link.href = 'https://www.dropbox.com/home'; link.target = '_blank'; link.rel = 'noopener'; link.textContent = 'Open Dropbox'; $('msg').append(link);
+  refresh(); loadProjects();
+}
+$('uploadBtn').onclick = () => runQueue(items.filter(i => i.status === 'Ready'));
+$('retryBtn').onclick = () => runQueue(items.filter(i => i.status === 'Failed'));
+$('stopBtn').onclick = () => { stopping = true; $('msg').textContent = 'Stopping after the current files finish…'; };
+window.addEventListener('beforeunload', e => { if (running) { e.preventDefault(); e.returnValue = ''; } });
+
+boot();
+</script>
+</body>
+</html>
