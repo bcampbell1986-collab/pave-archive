@@ -1,10 +1,10 @@
 // POST {client, project, purpose, name, size, type, date}
 // -> decides the Dropbox path (sorting rules) and returns a way to upload straight to Dropbox.
-const { checkPasscode, send, readJson, buildPath, dbx, getAccessToken, BIG_FILE } = require('./_lib');
+const { checkAuth, send, readJson, buildPath, dbx, getAccessToken, BIG_FILE } = require('./_lib');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return send(res, 405, { error: 'POST only' });
-  if (!checkPasscode(req, res)) return;
+  if (!await checkAuth(req, res)) return;
   try {
     const b = await readJson(req);
     const size = Number(b.size);

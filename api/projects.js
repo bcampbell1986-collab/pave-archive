@@ -1,5 +1,5 @@
 // GET -> clients and projects that already exist in Dropbox, so people pick the same names.
-const { checkPasscode, send, dbx, ROOT } = require('./_lib');
+const { checkAuth, send, dbx, ROOT } = require('./_lib');
 
 async function folders(path) {
   const out = [];
@@ -13,7 +13,7 @@ async function folders(path) {
 }
 
 module.exports = async (req, res) => {
-  if (!checkPasscode(req, res)) return;
+  if (!await checkAuth(req, res)) return;
   try {
     let clients = [];
     try { clients = await folders(ROOT()); } catch (e) { if (e.status !== 409) throw e; } // root not made yet

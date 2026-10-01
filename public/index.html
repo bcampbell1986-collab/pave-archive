@@ -58,16 +58,15 @@ header{backdrop-filter:blur(18px)}button{box-shadow:inset 0 1px 0 #ffffff55,0 4p
     <p id="missingList"></p>
     <p class="muted">Full steps are in the README.</p>
   </div>
-  <form id="setupPass" class="panel" hidden>
-    <p>Dropbox is linked to this workspace. Enter the team passcode to access uploads on this device.</p>
-    <label>Passcode<input id="passInput" type="password" autocomplete="current-password" required></label>
-    <p><button type="submit">Continue</button></p>
-    <p id="passMsg" class="muted"></p>
+  <form id="setupEmail" class="panel" hidden>
+    <p>Sign in with your approved email address.</p>
+    <label>Email<input id="emailInput" type="email" autocomplete="email" required></label>
+    <p><button id="emailSubmit" type="submit">Email me a sign-in link</button></p>
+    <p id="emailMsg" class="muted" role="status"></p>
   </form>
   <form id="setupConnect" class="panel" method="post" action="/api/dropbox-connect" hidden>
     <h2>Connect Dropbox</h2>
     <p>Approve access securely in Dropbox to connect this archive.</p>
-    <input type="hidden" name="passcode" id="connectPass">
     <button type="submit">Connect Dropbox</button>
     <p id="connectMsg" class="muted"></p>
   </form>
@@ -117,7 +116,7 @@ header{backdrop-filter:blur(18px)}button{box-shadow:inset 0 1px 0 #ffffff55,0 4p
 <script>
 const $ = id => document.getElementById(id);
 const store = { get(k){try{return localStorage.getItem(k)}catch{return null}}, set(k,v){try{localStorage.setItem(k,v)}catch{}}, del(k){try{localStorage.removeItem(k)}catch{}} };
-let passcode = store.get('pave-passcode') || '';
+store.del('pave-passcode');
 let RULES = { types:{}, purposes:[] }, ROOT = '/Pave Archive', projectsByClient = {};
 let items = []; // {file, date, status, path, error}
 let running = false, stopping = false, connected = false;
@@ -127,11 +126,11 @@ $('cleanupBtn').onclick=()=>$('cleanupDialog').showModal();$('keepOriginals').on
 async function api(path, body) {
   const r = await fetch(path, {
     method: body ? 'POST' : 'GET',
-    headers: Object.assign({ 'x-app-passcode': passcode }, body ? { 'Content-Type': 'application/json' } : {}),
+    headers: Object.assign({}, body ? { 'Content-Type': 'application/json' } : {}),
     body: body ? JSON.stringify(body) : undefined,
   });
   const j = await r.json().catch(() => ({ error: 'Server error ' + r.status }));
-  if (r.status === 401) { store.del('pave-passcode'); passcode = ''; }
+
   if (!r.ok) { const e = new Error(j.error || 'Error ' + r.status); e.status = r.status; throw e; }
   return j;
 }
@@ -141,7 +140,8 @@ async function boot() {
   let s;
   try { s = await api('/api/status'); }
   catch (e) {
-    if (e.status === 401) { s = { ready: false, step: 'passcode' }; setTimeout(() => $('passMsg').textContent = 'Wrong passcode. Try again.'); }
+    if (e.status === 401) { s = { ready: false, step: 'email', configured: true }; }
+    else if (e.status === 403) { s={ready:false,step:'email',configured:true}; $('emailMsg').textContent=e.message; }
     else if (e.status === 500) { s = { ready: false, step: 'env', missing: [] }; setTimeout(() => $('missingList').textContent = e.message); }
   }
   if (!s) {
@@ -150,27 +150,29 @@ async function boot() {
     $('missingList').textContent = 'The /api server is not running. Open this site from its Vercel address (not as a file).';
     return;
   }
-  ['setupEnv','setupPass','setupConnect'].forEach(id => $(id).hidden = true);
+  ['setupEnv','setupEmail','setupConnect'].forEach(id => $(id).hidden = true);
   if (!s.ready) {
     $('setup').hidden = false; $('app').hidden = true; connected=false; $('conn').textContent='Dropbox not connected'; refresh();
-    $('setupHeading').textContent=s.step==='passcode'?'Sign in to Pāvé':'Connect Dropbox'; $('conn').textContent = s.step==='passcode'?'Sign in required':'Dropbox connection needs attention'; $('conn').className = 'pill bad';
+    $('setupHeading').textContent=s.step==='email'?'Sign in to Pāvé':'Connect Dropbox'; $('conn').textContent = s.step==='email'?'Sign in required':'Dropbox connection needs attention'; $('conn').className = 'pill bad';
     if (s.step === 'env') { $('setupEnv').hidden = false; $('missingList').innerHTML = s.missing.map(m => '<code>'+m+'</code>').join(' '); }
-    if (s.step === 'passcode') { $('setupPass').hidden = false; $('setup').open=true; }
-    if (s.step === 'connect') { $('setupConnect').hidden = false; $('connectPass').value = passcode; if (s.error) $('connectMsg').textContent = s.error; }
+    if (s.step === 'email') { $('setupEmail').hidden = false; $('emailSubmit').disabled=!s.configured; if(!s.configured) $('emailMsg').textContent='Email login setup is pending. Supabase must be connected before sign-in links can be sent.'; }
+    if (s.step === 'connect') { $('setupConnect').hidden = false; if (s.error) $('connectMsg').textContent = s.error; }
     return;
   }
   connected=true; RULES = { types: s.types, purposes: s.purposes }; ROOT = s.root;
   $('setup').hidden = true; $('app').hidden = false;
-  $('conn').textContent = 'Dropbox connected' + (s.account ? ' · ' + s.account : ''); $('conn').className = 'pill ok';
+  $('conn').textContent = 'Dropbox connected · ' + s.user.email + (s.user.role==='admin'?' · Admin':''); $('conn').className = 'pill ok';
   $('purpose').replaceChildren(new Option('Sort by file type only', ''), ...s.purposes.map(p => new Option(p, p)));
   $('client').value = store.get('pave-client') || 'Zeus'; $('project').value = store.get('pave-project') || 'Baddies USA Pleasanton'; $('purpose').value = store.get('pave-purpose') || 'House Walk Through';
   $('rule').textContent = `How files are sorted: ${ROOT} / Client / Project / [Folder] / Photos·Videos·Documents / Year-Month / Date + original name. Nothing is ever overwritten. Exact duplicates are skipped.`;
   loadProjects(); refresh();
 }
 
-$('setupPass').onsubmit = e => {
-  e.preventDefault(); passcode = $('passInput').value.trim(); store.set('pave-passcode', passcode); $('passMsg').textContent = ''; boot();
+$('setupEmail').onsubmit = async e => {
+  e.preventDefault(); $('emailSubmit').disabled=true;
+  try {await api('/api/auth',{action:'login',email:$('emailInput').value.trim()});$('emailMsg').textContent='Check your email for the sign-in link.';} catch(e){$('emailMsg').textContent=e.message;} finally{$('emailSubmit').disabled=false;}
 };
+
 
 async function loadProjects() {
   try {
@@ -293,7 +295,7 @@ async function uploadOne(it) {
  const plan=await api('/api/upload-link',input);it.path=plan.path;
  if(plan.skip){bump(f.size);}else if(plan.mode==='link'){await xhrPost(plan.link,f,{'Content-Type':'application/octet-stream'},bump);}else{
   const CHUNK=3*1048576;let session=plan.session;
-  for(let off=0;off<f.size;off+=CHUNK){const final=off>0&&off+CHUNK>=f.size;const text=await xhrPost('/api/upload-session?offset='+off+'&finish='+(final?'1':'0'),f.slice(off,off+CHUNK),{'Content-Type':'application/octet-stream','x-app-passcode':passcode,'x-upload-session':session},bump);session=JSON.parse(text).session;}
+  for(let off=0;off<f.size;off+=CHUNK){const final=off>0&&off+CHUNK>=f.size;const text=await xhrPost('/api/upload-session?offset='+off+'&finish='+(final?'1':'0'),f.slice(off,off+CHUNK),{'Content-Type':'application/octet-stream','x-upload-session':session},bump);session=JSON.parse(text).session;}
  }
  const receipt=await api('/api/verify-upload',input);if(!receipt.verified)throw Error('Verification failed; keep original');it.receipt=receipt;return plan.skip?'Already there':'Done';
 }
@@ -335,7 +337,15 @@ $('retryBtn').onclick = () => runQueue(items.filter(i => i.status === 'Failed'))
 $('stopBtn').onclick = () => { stopping = true; $('msg').textContent = 'Stopping after the current files finish…'; };
 window.addEventListener('beforeunload', e => { if (running) { e.preventDefault(); e.returnValue = ''; } });
 
-boot();
+(async()=>{
+ const params=new URLSearchParams(location.hash.slice(1));
+ if(params.has('access_token')){
+  history.replaceState(null,'',location.pathname+location.search);
+  try{await api('/api/auth',{action:'session',access_token:params.get('access_token'),refresh_token:params.get('refresh_token')});}
+  catch(e){$('emailMsg').textContent=e.message;}
+ }
+ await boot();
+})();
 </script>
 </body>
 </html>

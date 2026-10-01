@@ -10,20 +10,46 @@ const ROOT = () => {
 };
 const BIG_FILE = 140 * 1024 * 1024; // temp upload links allow up to 150 MB
 
-// ---------- passcode ----------
-function checkPasscode(req, res) {
-  const want = env('APP_PASSCODE');
-  if (!want) {
-    send(res, 500, { error: 'APP_PASSCODE is not set in Vercel. Add it, then redeploy.' });
-    return false;
+// Verified email sessions. No shared passcode fallback.
+const ADMIN_EMAIL = 'bcampbell1986@gmail.com';
+const authReady = () => !!(env('SUPABASE_URL') && env('SUPABASE_ANON_KEY'));
+async function authRequest(path, body, token) {
+  const r = await fetch(env('SUPABASE_URL').replace(/\/$/, '') + '/auth/v1/' + path, {
+    method: body ? 'POST' : 'GET',
+    headers: { apikey: env('SUPABASE_ANON_KEY'), ...(token ? {Authorization:'Bearer '+token} : {}), ...(body ? {'Content-Type':'application/json'} : {}) },
+    ...(body ? {body:JSON.stringify(body)} : {}),
+  });
+  const data = await r.json().catch(()=>({}));
+  if (!r.ok) throw Object.assign(new Error('Email session could not be verified.'), {status:r.status});
+  return data;
+}
+function setSession(res, access, refresh) {
+  res.setHeader('Set-Cookie', [
+    'pave_access='+encodeURIComponent(access||'')+'; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age='+(access?3600:0),
+    'pave_refresh='+encodeURIComponent(refresh||'')+'; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age='+(refresh?604800:0),
+  ]);
+}
+function approvedUser(user) {
+  const email = String(user.email||'').toLowerCase();
+  if (!user.email_confirmed_at) return null;
+  if (email === ADMIN_EMAIL) return {id:user.id,email,role:'admin'};
+  const allowed = env('PAVE_APPROVED_EMAILS').split(',').map(x=>x.trim().toLowerCase()).filter(Boolean);
+  return allowed.includes(email) ? {id:user.id,email,role:'contributor'} : null;
+}
+async function checkAuth(req, res) {
+  if(req.method !== 'GET' && req.headers.origin !== 'https://pave-archive.vercel.app') {send(res,403,{error:'Open Pāvé to upload.'});return false;}
+  if (!authReady()) {send(res,503,{error:'Email login setup is pending. Connect Supabase to enable sign-in.'});return false;}
+  const cookies = Object.fromEntries(String(req.headers.cookie||'').split(';').map(x=>x.trim().split(/=(.*)/s)).filter(x=>x[0]).map(([k,v])=>[k,v||'']));
+  let user;
+  try {
+    if (!cookies.pave_access) throw Error('No session');
+    user = await authRequest('user',null,cookies.pave_access);
+  } catch {
+    if (!cookies.pave_refresh) {send(res,401,{error:'Sign in with your email.'});return false;}
+    try {const session=await authRequest('token?grant_type=refresh_token',{refresh_token:cookies.pave_refresh});user=session.user;setSession(res,session.access_token,session.refresh_token);} catch {setSession(res,'','');send(res,401,{error:'Your session expired. Sign in again.'});return false;}
   }
-  const got = String(req.headers['x-app-passcode'] || (req.body && req.body.passcode) || '');
-  const a = crypto.createHash('sha256').update(got).digest();
-  const b = crypto.createHash('sha256').update(want).digest();
-  if (!crypto.timingSafeEqual(a, b)) {
-    send(res, 401, { error: 'Wrong passcode.' });
-    return false;
-  }
+  req.user = approvedUser(user);
+  if (!req.user) {send(res,403,{error:'Your email needs administrator approval.'});return false;}
   return true;
 }
 
@@ -82,16 +108,16 @@ function redirectUri(req) {
   return 'https://pave-archive.vercel.app/api/dropbox-callback';
 }
 
-// signed "state" so only someone with the passcode can start Connect
+// Signed state for the administrator Dropbox connection.
 function signState() {
   const ts = Date.now().toString();
-  const sig = crypto.createHmac('sha256', env('DROPBOX_APP_SECRET') + env('APP_PASSCODE')).update(ts).digest('hex');
+  const sig = crypto.createHmac('sha256', env('DROPBOX_APP_SECRET')).update(ts).digest('hex');
   return ts + '.' + sig;
 }
 function checkState(state) {
   const [ts, sig] = String(state || '').split('.');
   if (!ts || !sig || !Number.isFinite(Number(ts)) || Number(ts)>Date.now() || Date.now() - Number(ts) > 15 * 60 * 1000) return false;
-  const want = crypto.createHmac('sha256', env('DROPBOX_APP_SECRET') + env('APP_PASSCODE')).update(ts).digest('hex');
+  const want = crypto.createHmac('sha256', env('DROPBOX_APP_SECRET')).update(ts).digest('hex');
   return want.length === sig.length && crypto.timingSafeEqual(Buffer.from(want), Buffer.from(sig));
 }
 
@@ -155,4 +181,4 @@ function buildPath({ client, project, purpose, name, type, date }) {
   return parts.join('/');
 }
 
-module.exports = { TYPES, env, ROOT, BIG_FILE, checkPasscode, send, readJson, getAccessToken, dbx, httpError, redirectUri, signState, checkState, buildPath, fileType, clean, PURPOSES };
+module.exports = { TYPES, env, ROOT, BIG_FILE, checkAuth, authReady, authRequest, setSession, approvedUser, ADMIN_EMAIL, send, readJson, getAccessToken, dbx, httpError, redirectUri, signState, checkState, buildPath, fileType, clean, PURPOSES };
