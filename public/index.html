@@ -51,7 +51,7 @@ header{backdrop-filter:blur(18px)}button{box-shadow:inset 0 1px 0 #ffffff55,0 4p
 
 <main>
 <!-- ============ SETUP (only shows when something is missing) ============ -->
-<details id="setup" hidden><summary>Dropbox connection setup</summary>
+<section id="setup" hidden><h2 id="setupHeading">Sign in to Pāvé</h2>
   <div id="setupEnv" class="panel" hidden>
     <h2>Vercel is missing some settings</h2>
     <p>Add these in Vercel → your project → Settings → Environment Variables, then Redeploy:</p>
@@ -59,7 +59,7 @@ header{backdrop-filter:blur(18px)}button{box-shadow:inset 0 1px 0 #ffffff55,0 4p
     <p class="muted">Full steps are in the README.</p>
   </div>
   <form id="setupPass" class="panel" hidden>
-    <h2>Enter the team passcode</h2>
+    <p>Dropbox is linked to this workspace. Enter the team passcode to access uploads on this device.</p>
     <label>Passcode<input id="passInput" type="password" autocomplete="current-password" required></label>
     <p><button type="submit">Continue</button></p>
     <p id="passMsg" class="muted"></p>
@@ -71,12 +71,12 @@ header{backdrop-filter:blur(18px)}button{box-shadow:inset 0 1px 0 #ffffff55,0 4p
     <button type="submit">Connect Dropbox</button>
     <p id="connectMsg" class="muted"></p>
   </form>
-</details>
+</section>
 
 <!-- ============ MAIN APP ============ -->
 <section id="app" hidden>
   <h1>Add to the archive</h1>
-  <p class="muted">Choose a project and add a batch of photos, videos, or files.</p>
+  <p class="muted">Choose a project, add your files, then upload the batch to Dropbox.</p>
 
   <div class="panel">
     <h2>Project destination</h2>
@@ -103,7 +103,7 @@ header{backdrop-filter:blur(18px)}button{box-shadow:inset 0 1px 0 #ffffff55,0 4p
       <table><thead><tr><th>File</th><th class="hide">Goes to</th><th>Status</th></tr></thead><tbody id="rows"></tbody></table>
     </div>
 
-    <button id="uploadBtn" class="secondary" disabled hidden>Resume upload</button>
+    <button id="uploadBtn" class="big" disabled>Upload to Dropbox</button><p id="uploadHelp" class="muted">Choose a project and select files, then upload the batch.</p>
     <p></p>
     <progress id="bar" value="0" max="1" hidden></progress>
     <p id="msg" role="status" aria-live="polite"></p>
@@ -152,8 +152,8 @@ async function boot() {
   }
   ['setupEnv','setupPass','setupConnect'].forEach(id => $(id).hidden = true);
   if (!s.ready) {
-    $('setup').hidden = false; $('app').hidden = false; connected=false; $('conn').textContent='Dropbox not connected'; refresh();
-    $('conn').textContent = s.step==='passcode'?'Sign in required':'Dropbox not connected'; $('conn').className = 'pill bad';
+    $('setup').hidden = false; $('app').hidden = true; connected=false; $('conn').textContent='Dropbox not connected'; refresh();
+    $('setupHeading').textContent=s.step==='passcode'?'Sign in to Pāvé':'Connect Dropbox'; $('conn').textContent = s.step==='passcode'?'Sign in required':'Dropbox connection needs attention'; $('conn').className = 'pill bad';
     if (s.step === 'env') { $('setupEnv').hidden = false; $('missingList').innerHTML = s.missing.map(m => '<code>'+m+'</code>').join(' '); }
     if (s.step === 'passcode') { $('setupPass').hidden = false; $('setup').open=true; }
     if (s.step === 'connect') { $('setupConnect').hidden = false; $('connectPass').value = passcode; if (s.error) $('connectMsg').textContent = s.error; }
@@ -232,8 +232,7 @@ async function addFiles(list) {
   $('summary').textContent = 'Reading files…';
   for (const f of fresh) items.push({ file: f, date: (await photoDate(f)) || localDay(f.lastModified), status: 'Ready' });
   refresh();
-  if(connected && $('client').value.trim() && $('project').value.trim()) await runQueue(items.filter(i=>i.status==='Ready'));
-  else $('msg').textContent=connected?'Choose Client and Project, then resume your batch.':'Files selected. Dropbox is not connected yet; nothing has been transferred.';
+  $('msg').textContent=connected?'Batch selected. Review the destination, then press Upload to Dropbox.':'Sign in before uploading. No files have been transferred.';
 }
 $('pickFiles').onclick = () => $('files').click();
 
@@ -263,10 +262,10 @@ function refresh() {
   const total = todo.reduce((n, i) => n + i.file.size, 0);
   $('summary').textContent = items.length ? `${items.length} files · ${todo.length} waiting to upload (${mb(total)})` : 'No files yet.';
   const ok = $('client').value.trim() && $('project').value.trim();
-  $('uploadBtn').hidden=running || !connected || !todo.some(i=>i.status==='Ready');
+  $('uploadBtn').hidden=false;
   $('pickFiles').disabled=running; ['client','project','purpose'].forEach(id=>$(id).disabled=running);
   $('uploadBtn').disabled = !connected || running || !todo.filter(i => i.status === 'Ready').length || !ok;
-  $('uploadBtn').textContent = running ? 'Uploading…' : !ok && items.length ? 'Fill in Client and Project first' : `Upload ${todo.filter(i => i.status === 'Ready').length || ''} files to Dropbox`.replace('  ', ' ');
+  $('uploadBtn').textContent=running?'Uploading…':todo.some(i=>i.status==='Ready')?`Upload ${todo.filter(i=>i.status==='Ready').length} files to Dropbox`:'Upload to Dropbox';$('uploadHelp').textContent=!connected?'Sign in to enable uploads.':!ok?'Choose Client and Project first.':!todo.some(i=>i.status==='Ready')?'Select files to enable upload.':'Transfers the selected originals to Dropbox and verifies each file.';
   $('retryBtn').hidden = running || !items.some(i => i.status === 'Failed');
 }
 
