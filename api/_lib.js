@@ -79,9 +79,7 @@ async function dbx(endpoint, args) {
 function httpError(status, message) { const e = new Error(message); e.status = status; return e; }
 
 function redirectUri(req) {
-  const host = req.headers['x-forwarded-host'] || req.headers.host;
-  const proto = req.headers['x-forwarded-proto'] || (host && host.startsWith('localhost') ? 'http' : 'https');
-  return `${proto}://${host}/api/dropbox-callback`;
+  return 'https://pave-archive.vercel.app/api/dropbox-callback';
 }
 
 // signed "state" so only someone with the passcode can start Connect
@@ -92,7 +90,7 @@ function signState() {
 }
 function checkState(state) {
   const [ts, sig] = String(state || '').split('.');
-  if (!ts || !sig || Date.now() - Number(ts) > 15 * 60 * 1000) return false;
+  if (!ts || !sig || !Number.isFinite(Number(ts)) || Number(ts)>Date.now() || Date.now() - Number(ts) > 15 * 60 * 1000) return false;
   const want = crypto.createHmac('sha256', env('DROPBOX_APP_SECRET') + env('APP_PASSCODE')).update(ts).digest('hex');
   return want.length === sig.length && crypto.timingSafeEqual(Buffer.from(want), Buffer.from(sig));
 }
@@ -105,7 +103,7 @@ const TYPES = {
   Design: ['psd', 'ai', 'indd', 'svg', 'eps', 'sketch', 'fig', 'dwg', 'dxf', 'skp'],
   Audio: ['mp3', 'wav', 'm4a', 'aac', 'aiff', 'flac'],
 };
-const PURPOSES = ['House walkthrough', 'Production - install', 'Furniture - rentals', 'Damage - returns', 'Final deliverables', 'Contracts - invoices'];
+const PURPOSES = ['House Walk Through', 'Production - install', 'Furniture - rentals', 'Damage - returns', 'Final deliverables', 'Contracts - invoices'];
 
 function fileType(name, mime = '') {
   const ext = (String(name).split('.').pop() || '').toLowerCase();
